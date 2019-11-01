@@ -1,3 +1,3 @@
-import http_service
+import navigator
 
-http_service.getGoogle()
+navigator.getPythonHomepage()
