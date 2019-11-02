@@ -1,3 +1,8 @@
-import navigator
+import navigator as nav
+import extractor as ext
 
-navigator.getPythonHomepage()
+# TODO: Replace with actual call to A-league and build new extractor.
+html = nav.getPythonHomepage()
+pretty = ext.prettify(html)
+
+headlines = ext.extractLatestNews(html)
