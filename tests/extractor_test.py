@@ -19,3 +19,5 @@ def test_extractLatestNews():
         assert headlines[dates[4]].text == 'Python 2.7.17 released'
         assert headlines[dates[4]
                          ].link == 'http://feedproxy.google.com/~r/PythonInsider/~3/NSJOxfu3Kw0/python-2717-released.html'
+
+    file.close()

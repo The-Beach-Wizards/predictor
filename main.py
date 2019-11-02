@@ -1,8 +1,19 @@
 import navigator as nav
 import extractor as ext
+import csv
 
-# TODO: Replace with actual call to A-league and build new extractor.
+
 html = nav.getPythonHomepage()
-pretty = ext.prettify(html)
-
 headlines = ext.extractLatestNews(html)
+
+rows = [['Date', 'Headline', 'Link']]
+
+for date, headline in headlines.items():
+    row = [date, headline.text, headline.link]
+    rows.append(row)
+
+with open('D:\\aleague_data\\headlines.csv', 'w', newline="") as writeFile:
+    writer = csv.writer(writeFile)
+    writer.writerows(rows)
+
+writeFile.close()
