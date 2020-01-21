@@ -1,5 +1,5 @@
 from bs4 import BeautifulSoup
-from models.headline import Headline
+from models.wind import Wind
 
 
 def prettify(html):
@@ -7,17 +7,31 @@ def prettify(html):
     return soup.prettify
 
 
-def extractLatestNews(html):
+def extractCurrentTemperature(html):
     soup = BeautifulSoup(html, 'html.parser')
-    all_h2 = soup.findAll('h2')
+    h1 = soup.find('h1')
 
-    headlines = {}
+    return h1.text.strip()[:4]
 
-    for h2 in all_h2:
-        if "Latest News" in h2:
-            all_li = h2.parent.ul.findAll('li')
 
-            for li in all_li:
-                headlines[li.time.text] = Headline(li.a.text, li.a['href'])
+def extractHumidity(html):
+    soup = BeautifulSoup(html, 'html.parser')
+    humidity = soup.find('li', {'class': 'humidity'})
+    spans = humidity.findAll('span')
 
-    return headlines
+    return spans[0].text[:-1]
+
+
+def extractWind(html):
+    soup = BeautifulSoup(html, 'html.parser')
+    wind = soup.find('li', {'class': 'wind'})
+
+    direction = wind.find('strong').text
+
+    windAndGustSpeedKmHr = wind.findAll(
+        'span')[0].text.strip().replace(' ', '')
+
+    windSpeed = windAndGustSpeedKmHr[:4]
+    gustSpeed = windAndGustSpeedKmHr[9:13]
+
+    return Wind(direction, windSpeed, gustSpeed)
