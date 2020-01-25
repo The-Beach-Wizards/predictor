@@ -1,6 +1,7 @@
 from bs4 import BeautifulSoup
 from models.wind import Wind
 from models.weather import Weather
+from models.tideTime import TideTime
 
 
 def prettify(html):
@@ -29,7 +30,7 @@ def __extractCurrentTemperature(html) -> str:
 def __extractHumidity(html) -> str:
     soup = BeautifulSoup(html, 'html.parser')
     humidity = soup.find('li', {'class': 'humidity'})
-    spans = humidity.findAll('span')
+    spans = humidity.find_all('span')
 
     return spans[0].text[:-1]
 
@@ -47,3 +48,29 @@ def __extractWind(html) -> Wind:
     gustSpeed = windAndGustSpeedKmHr[9:13]
 
     return Wind(direction, windSpeed, gustSpeed)
+
+# endregion
+
+# region Tide Extraction
+
+
+def extractTides(tideHtml):
+    currentTide = __extractCurrentTide(tideHtml)
+    return currentTide
+
+
+def __extractCurrentTide(tideHtml):
+    soup = BeautifulSoup(tideHtml, 'html.parser')
+    list_items = soup.find_all('li', {'class': ['day', 'current']})
+    inner_list_items = []
+    for item in list_items:
+        if 'Today' in item.text:
+            inner_list_items = item.find('ul').find_all('li')
+
+    tideTimes = []
+    for item in inner_list_items:
+        tideTimes.append(
+            TideTime(item.find('h3').text, item.find('span').text))
+
+    return tideTimes
+# endregion
