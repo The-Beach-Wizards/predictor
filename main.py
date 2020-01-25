@@ -3,15 +3,13 @@ import extractor as ext
 import csv
 
 
-html = nav.getWeatherForLocation('mount-coolum')
-currentTemperature = ext.extractCurrentTemperature(html)
-humidity = ext.extractHumidity(html)
-wind = ext.extractWind(html)
+weatherHtml = nav.getWeatherForLocation('mount-coolum')
+weather = ext.extractWeather(weatherHtml)
 
-print("Temperature: " + currentTemperature + " C")
-print("Humidity: " + humidity + " %")
-print("Wind speed: " + wind.strength + "km/hr " +
-      wind.direction + " (" + wind.gusts + " km/hr Gusts)")
+print("Temperature: " + weather.temperature + " C")
+print("Humidity: " + weather.humidity + " %")
+print("Wind speed: " + weather.wind.strength + "km/hr " +
+      weather.wind.direction + " (" + weather.wind.gusts + " km/hr Gusts)")
 
 # TODO: Replace this with new database entries for weather.
 # rows = [['Date', 'Headline', 'Link']]

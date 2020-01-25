@@ -1,5 +1,6 @@
 from bs4 import BeautifulSoup
 from models.wind import Wind
+from models.weather import Weather
 
 
 def prettify(html):
@@ -7,14 +8,25 @@ def prettify(html):
     return soup.prettify
 
 
-def extractCurrentTemperature(html):
+# region Weather Extraction
+
+
+def extractWeather(weatherHtml):
+    currentTemperature = __extractCurrentTemperature(weatherHtml)
+    humidity = __extractHumidity(weatherHtml)
+    wind = __extractWind(weatherHtml)
+
+    return Weather(currentTemperature, humidity, wind)
+
+
+def __extractCurrentTemperature(html) -> str:
     soup = BeautifulSoup(html, 'html.parser')
     h1 = soup.find('h1')
 
     return h1.text.strip()[:4]
 
 
-def extractHumidity(html):
+def __extractHumidity(html) -> str:
     soup = BeautifulSoup(html, 'html.parser')
     humidity = soup.find('li', {'class': 'humidity'})
     spans = humidity.findAll('span')
@@ -22,7 +34,7 @@ def extractHumidity(html):
     return spans[0].text[:-1]
 
 
-def extractWind(html):
+def __extractWind(html) -> Wind:
     soup = BeautifulSoup(html, 'html.parser')
     wind = soup.find('li', {'class': 'wind'})
 
