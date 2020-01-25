@@ -2,6 +2,7 @@ from bs4 import BeautifulSoup
 from models.wind import Wind
 from models.weather import Weather
 from models.tideTime import TideTime
+from datetime import datetime as dt
 
 
 def prettify(html):
@@ -67,10 +68,12 @@ def __extractCurrentTide(tideHtml):
         if 'Today' in item.text:
             inner_list_items = item.find('ul').find_all('li')
 
+    format = '%I:%M %p'
+
     tideTimes = []
     for item in inner_list_items:
         tideTimes.append(
-            TideTime(item.find('h3').text, item.find('span').text))
+            TideTime(dt.strptime(item.find('h3').text, format), item.find('span').text))
 
     return tideTimes
 # endregion
