@@ -12,7 +12,10 @@ print("Wind speed: " + weather.wind.strength + "km/hr " +
       weather.wind.direction + " (" + weather.wind.gusts + " km/hr Gusts)")
 
 tideHtml = nav.getTidesForLocation('mount-coolum')
-currentTide = ext.extractTides(tideHtml)
+currentTideInformation = ext.extractTides(tideHtml)
+
+print('Current tide: ' + str(currentTideInformation.currentTide))
+print('Movement direction: ' + currentTideInformation.movement)
 
 # TODO: Replace this with new database entries for weather.
 # rows = [['Date', 'Headline', 'Link']]

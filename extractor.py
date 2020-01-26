@@ -2,7 +2,11 @@ from bs4 import BeautifulSoup
 from models.wind import Wind
 from models.weather import Weather
 from models.tideTime import TideTime
+from models.tides import Tides
 from datetime import datetime as dt
+from datetime import timedelta as td
+import numpy as np
+import calendar
 
 
 def prettify(html):
@@ -56,11 +60,13 @@ def __extractWind(html) -> Wind:
 
 
 def extractTides(tideHtml):
-    currentTide = __extractCurrentTide(tideHtml)
-    return currentTide
+    tideTimes = __extractTideTimes(tideHtml)
+    currentTide = __computeCurrentTide(tideTimes)
+    direction = __getTideMovementDirection(tideTimes)
+    return Tides(currentTide, direction, tideTimes)
 
 
-def __extractCurrentTide(tideHtml):
+def __extractTideTimes(tideHtml):
     soup = BeautifulSoup(tideHtml, 'html.parser')
     list_items = soup.find_all('li', {'class': ['day', 'current']})
     inner_list_items = []
@@ -68,12 +74,55 @@ def __extractCurrentTide(tideHtml):
         if 'Today' in item.text:
             inner_list_items = item.find('ul').find_all('li')
 
-    format = '%I:%M %p'
+    date = dt.now().date()
+    format = '%Y-%m-%d %I:%M %p'
 
     tideTimes = []
     for item in inner_list_items:
         tideTimes.append(
-            TideTime(dt.strptime(item.find('h3').text, format), item.find('span').text))
+            TideTime(dt.strptime(str(date) + ' ' + item.find('h3').text, format), float(item.find('span').text[:3])))
 
     return tideTimes
+
+
+def __computeCurrentTide(tideTimes):
+    xp = []
+    fp = []
+
+    for tide in tideTimes:
+        xp.append(toTimestamp(tide.time))
+        fp.append(tide.height)
+
+    today = toTimestamp(dt.now())
+    return np.interp(today, xp, fp)
+
+
+def toTimestamp(d):
+    return calendar.timegm(d.timetuple())
+
+
+def __getTideMovementDirection(tideTimes):
+    xp = []
+    fp = []
+
+    for tide in tideTimes:
+        xp.append(toTimestamp(tide.time))
+        fp.append(tide.height)
+
+    tenMinutesAgo = toTimestamp(dt.now() - td(minutes=10))
+    now = toTimestamp(dt.now())
+    tenMinutesFromNow = toTimestamp(dt.now() + td(minutes=10))
+
+    heightTenMinutesAgo = np.interp(tenMinutesAgo, xp, fp)
+    heightNow = np.interp(now, xp, fp)
+    heightTenMinutesFromNow = np.interp(tenMinutesFromNow, xp, fp)
+
+    if heightNow > heightTenMinutesAgo and heightNow < heightTenMinutesFromNow:
+        return 'Incoming'
+
+    if heightNow < heightTenMinutesAgo and heightNow > heightTenMinutesFromNow:
+        return 'Outgoing'
+
+    if heightNow < heightTenMinutesAgo and heightNow > heightTenMinutesFromNow:
+        return 'Peaking'
 # endregion
