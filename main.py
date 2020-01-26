@@ -3,17 +3,26 @@ import extractor as ext
 import csv
 
 
-html = nav.getPythonHomepage()
-headlines = ext.extractLatestNews(html)
+weatherHtml = nav.getWeatherForLocation('mount-coolum')
+weather = ext.extractWeather(weatherHtml)
 
-rows = [['Date', 'Headline', 'Link']]
+print("Temperature: " + weather.temperature + " C")
+print("Humidity: " + weather.humidity + " %")
+print("Wind speed: " + weather.wind.strength + "km/hr " +
+      weather.wind.direction + " (" + weather.wind.gusts + " km/hr Gusts)")
 
-for date, headline in headlines.items():
-    row = [date, headline.text, headline.link]
-    rows.append(row)
+tideHtml = nav.getTidesForLocation('mount-coolum')
+currentTideInformation = ext.extractTides(tideHtml)
 
-with open('D:\\aleague_data\\headlines.csv', 'w', newline="") as writeFile:
-    writer = csv.writer(writeFile)
-    writer.writerows(rows)
+print('Current tide: ' + str(currentTideInformation.currentTide))
+print('Movement direction: ' + currentTideInformation.movement)
 
-writeFile.close()
+# TODO: Replace this with new database entries for weather.
+# rows = [['Date', 'Headline', 'Link']]
+# for date, headline in headlines.items():
+#     row = [date, headline.text, headline.link]
+#     rows.append(row)
+# with open('C:\\headlines.csv', 'w', newline="") as writeFile:
+#     writer = csv.writer(writeFile)
+#     writer.writerows(rows)
+# writeFile.close()

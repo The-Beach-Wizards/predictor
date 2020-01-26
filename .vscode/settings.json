@@ -1,5 +1,5 @@
 {
-    "python.pythonPath": "C:\\Anaconda3\\python.exe",
+    "python.pythonPath": "predictor\\Scripts\\python.exe",
     "python.testing.pytestArgs": [
         "tests"
     ],
