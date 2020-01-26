@@ -7,6 +7,7 @@ from datetime import datetime as dt
 from datetime import timedelta as td
 import numpy as np
 import calendar
+import re
 
 
 def prettify(html):
@@ -49,8 +50,10 @@ def __extractWind(html) -> Wind:
     windAndGustSpeedKmHr = wind.findAll(
         'span')[0].text.strip().replace(' ', '')
 
-    windSpeed = windAndGustSpeedKmHr[:4]
-    gustSpeed = windAndGustSpeedKmHr[9:13]
+    windSpeed = re.search(r'(\d+\.\d)', windAndGustSpeedKmHr).group(0)
+
+    gusts = windAndGustSpeedKmHr.find('(')
+    gustSpeed = re.search(r'(\d+\.\d)', windAndGustSpeedKmHr[gusts:]).group(0)
 
     return Wind(direction, windSpeed, gustSpeed)
 
